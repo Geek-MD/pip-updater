@@ -50,11 +50,11 @@ With *-i* or *--interactive* you will be prompted to answer for each package if 
 
 Finally with *-e* or *--exceptions*, the script will search in exceptions.txt, for packages which you don't want to be updated, or packages you want to be freezed at a specific version. Write one package per line, using "name" format if you want to exclude it from updating, or using "name==version" format if you want to freeze a package at a specific version.
 
-Here's an example of how *exceptions.txt* will look like
+*--interactive* and *--exceptions* options can be used together, but *--list* excludes the other options.
+
+Here's an example of how *exceptions.txt* will look like. In this example, argparse will be freezed at 3.11 and numpy will not be updated.
 
 ```
 argparse==3.11
 numpy
 ```
-
-*--interactive* and *--exceptions* options can be used together, but *--list* excludes the other options.
