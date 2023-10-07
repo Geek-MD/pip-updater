@@ -1,4 +1,4 @@
-#!/usr/bin/env python3cat
+#!/usr/bin/env python3
 
 # pip-updater v0.2.0
 # File: pip-updater.py
