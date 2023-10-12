@@ -71,4 +71,4 @@ python3 pip-updater.py -c '0 4 */7,14,21,28 * *'
 
 In the example, the script will run at 4:00 on day 7, 14, 21 and 28 of every month.
 
-The only option that can be used in conjuction with *-c*, is *-e* or *--exceptions*.
+The only option that can be used in conjunction with *-c*, is *-e* or *--exceptions*.
