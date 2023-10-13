@@ -98,7 +98,7 @@ def list_outdated_packages():
         text=True,
     )
     if len(outdated_list.stdout) == 0:
-        print("There aren't outdated packages.")
+        print("There aren't any outdated packages.")
     else:
         print(outdated_list.stdout)
     exit(0)
@@ -112,8 +112,8 @@ def get_pip_packages(config, local_path):
     outdated_data = json.loads(outdated_object.stdout)
     if outdated_object.returncode == 0:
         if len(outdated_data) == 0:
-            print("There aren't outdated packages.")
-            logging.info(f"\n{log_date} -- There aren't outdated packages.")
+            print("There aren't any outdated packages.")
+            logging.info(f"\n{log_date} -- There aren't any outdated packages.")
         else:
             update_packages(config, outdated_data, log_date, local_path)
     else:
@@ -133,19 +133,19 @@ def update_packages(config, outdated_data, log_date, local_path):
     if exceptions:
         exceptions_data = get_exceptions_packages(exceptions, exceptions_file, log_date)
     try:
-        logging.info(f"\n{log_date} -- Updating packages")
+        logging.info(f"\n{log_date} -- Updating packages.")
         for element in outdated_data:
             pkg_name = element.get("name")
             pkg_version = element.get("version")
             latest_version = element.get("latest_version")
             if pkg_name in exceptions_data:
                 if exceptions_data[pkg_name] is None:
-                    msg = f"{pkg_name} not updated - exception noted at exceptions.txt"
+                    msg = f"{pkg_name} not updated - exception noted at exceptions.txt."
                     print(msg)
                     logging.info(msg)
                     continue
                 else:
-                    msg = f"{pkg_name} frozen at {exceptions_data[pkg_name]} - exception noted at exceptions.txt"
+                    msg = f"{pkg_name} frozen at {exceptions_data[pkg_name]} - exception noted at exceptions.txt."
                     print(msg)
                     logging.info(msg)
                     update_single_package(
@@ -160,14 +160,14 @@ def update_packages(config, outdated_data, log_date, local_path):
                         if confirmation == "y" or confirmation == "n":
                             break
                         else:
-                            print(f'Invalid input. Please, enter "y" or "n"')
+                            print(f'Invalid input. Please, enter "y" or "n".')
                     if confirmation != "y":
-                        msg = f"{pkg_name} not updated - cancelled by user"
+                        msg = f"{pkg_name} not updated - cancelled by user."
                         print(msg)
                         logging.info(msg)
                         continue
                     else:
-                        msg = f"Updating {pkg_name} from {pkg_version} to {latest_version}"
+                        msg = f"Updating {pkg_name} from {pkg_version} to {latest_version}."
                         print(msg)
                         update_single_package(
                             pkg_name, pkg_version, latest_version, False
@@ -175,12 +175,12 @@ def update_packages(config, outdated_data, log_date, local_path):
                         continue
                 else:
                     update_single_package(pkg_name, pkg_version, latest_version, False)
-                    msg = f"{pkg_name} updated to {latest_version}"
+                    msg = f"{pkg_name} updated to {latest_version}."
                     print(msg)
                     continue
 
     except json.JSONDecodeError as e:
-        logging.info(f"{log_date} -- Error when decoding JSON stdout")
+        logging.info(f"{log_date} -- Error when decoding JSON stdout.")
         logging.info(str(e))
         exit(0)
 
@@ -193,19 +193,19 @@ def add_exceptions(add_packages, exceptions_file, log_date):
         if re.match(regex, element):
             results = [element in pkg for pkg in exceptions_pkgs]
             if any(results):
-                msg = f"Package '{element}' already in exceptions.txt"
+                msg = f"Package '{element}' already in exceptions.txt."
                 print(msg)
                 logging.info(f"{log_date} -- {msg}")
                 continue
             else:
-                msg = f"Package '{element}' added to exceptions.txt"
+                msg = f"Package '{element}' added to exceptions.txt."
                 print(msg)
                 logging.info(f"{log_date} -- {msg}")
                 file = open(exceptions_file, "a")
                 file.write("\n" + element)
                 continue
         else:
-            msg = f"Package '{element}' doesn't match the required format"
+            msg = f"Package '{element}' doesn't match the required format."
             print(msg)
             logging.info(f"{log_date} -- {msg}")
             continue
@@ -227,7 +227,7 @@ def get_exceptions_packages(exceptions, exceptions_file, log_date):
                             pkg_name, version = elements[0], None
                         exceptions_data.append(({"name": pkg_name, "version": version}))
                     else:
-                        msg = f"Package '{line}' doesn't match the required format"
+                        msg = f"Package '{line}' doesn't match the required format."
                         print(msg)
                         logging.info(f"{log_date} -- {msg}")
                         continue
@@ -237,7 +237,7 @@ def get_exceptions_packages(exceptions, exceptions_file, log_date):
             logging.info(f"{log_date} -- {msg}")
             exit(0)
         except Exception as e:
-            msg = "There was an error trying to read exceptions.txt"
+            msg = "There was an error trying to read exceptions.txt."
             print(f"{msg}: {str(e)}")
             logging.info(f"{log_date} -- {msg}")
             logging.info(str(e))
@@ -264,16 +264,16 @@ def update_single_package(pkg_name, pkg_version, latest_version, exceptions):
         )
     if result.returncode == 0:
         if exceptions:
-            msg = f"Correctly installed: {pkg_name} frozen at {latest_version}"
+            msg = f"Correctly installed: {pkg_name} frozen at {latest_version}."
         else:
-            msg = f"Correctly installed: {pkg_name} from {pkg_version} to {latest_version}"
+            msg = f"Correctly installed: {pkg_name} from {pkg_version} to {latest_version}."
         print(msg)
         logging.info(msg)
     else:
         if exceptions:
-            msg = f"Error when freezing {pkg_name} to {latest_version}"
+            msg = f"Error when freezing {pkg_name} to {latest_version}."
         else:
-            msg = f"Error when upgrading {pkg_name} from {pkg_version} to {latest_version}"
+            msg = f"Error when upgrading {pkg_name} from {pkg_version} to {latest_version}."
         print(msg)
         print(result.stderr)
         logging.info(msg)
@@ -299,7 +299,7 @@ def crontab_job(config, local_path):
         cronjob.write()
         exit(0)
     else:
-        msg = "The crontab format is not correct"
+        msg = "The crontab format is not correct."
         print(msg)
         logging.info(f"{log_date} -- {msg}")
         exit(0)
