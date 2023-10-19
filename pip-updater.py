@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# pip-updater v0.3.0
+# pip-updater v0.3.2
 # File: pip-updater.py
 # Description: Script designed to update pip packages
 
@@ -17,27 +17,27 @@ from crontab import CronTab
 
 
 def get_config(local_path):
-    with open(f"{local_path}/pip-updater.json", "r") as config:
+    with open(f'{local_path}/pip-updater.json', 'r') as config:
         data = json.load(config)
-        prog_name_short = data["prog_name_short"]
-        prog_name_long = data["prog_name_long"]
-        version = data["version"]
+        prog_name_short = data['prog_name_short']
+        prog_name_long = data['prog_name_long']
+        version = data['version']
     return prog_name_short, prog_name_long, version
 
 
 def argument_parser(program_name_short, program_name_long, ver):
     description = f"{program_name_long} is a python script which updates all outdated pip packages."
-    epilog = f"""By default, {program_name_long} updates all outdated pip packages without asking for confirmation.
-If you want to exclude some packages from updating or want to freeze a package into a specific version without updating
-it, you must populate the file named "exceptions.txt", adding the name of the desired package, one package per line.
-In order to freeze a pip package into a specific version, use "pkg_name==version" format. Alternatively you can use the
-"--add-file" option to add packages to "exceptions.txt" via command line."""
+    epilog = (f"By default, {program_name_long} updates all outdated pip packages without asking for confirmation.\nIf "
+              f"you want to exclude some packages from updating or want to freeze a package into a specific version "
+              f"without updating) it, you must populate the file named \"exceptions.txt\", adding the name of the "
+              f"desired package, one package per line.\nIn order to freeze a pip package into a specific version, use "
+              f"\"pkg_name==version\" format. Alternatively you can use the \"--add-file\" option to add packages to "
+              f"\"exceptions.txt\" via command line.")
     parser = argparse.ArgumentParser(
         prog=f"{program_name_short}",
         description=textwrap.dedent(f"{description}"),
         epilog=f"{epilog}",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        usage="python3 %(prog)s.py [-h] [-v] [-l] [-i] [-e] [-a file ...] [-c cron]",
     )
     parser.add_argument(
         "-v",
@@ -56,7 +56,7 @@ In order to freeze a pip package into a specific version, use "pkg_name==version
         required=False,
         action="store",
         metavar="cron",
-        nargs="+",
+        nargs="?",
         help="[optional] used to schedule the update of packages via crontab.",
     )
     group.add_argument(
@@ -65,7 +65,7 @@ In order to freeze a pip package into a specific version, use "pkg_name==version
         required=False,
         action="store_true",
         help="[optional] used to update pip packages interactively, allowing to update or not update"
-        "packages one by one.",
+             "packages one by one.",
     )
     group.add_argument(
         "-e",
@@ -73,7 +73,7 @@ In order to freeze a pip package into a specific version, use "pkg_name==version
         action="store_true",
         required=False,
         help="[optional] used to exclude the update of some packages or to freeze a package into a"
-        "specific version, without updating it.",
+             "specific version, without updating it.",
     )
     group.add_argument(
         "-a",
@@ -81,7 +81,7 @@ In order to freeze a pip package into a specific version, use "pkg_name==version
         required=False,
         action="store",
         metavar="file",
-        nargs="+",
+        nargs="*",
         help="[optional] used to add packages to exceptions.txt via command line.",
     )
     args = parser.parse_args()
@@ -98,7 +98,7 @@ def list_outdated_packages():
         text=True,
     )
     if len(outdated_list.stdout) == 0:
-        print("There aren't any outdated packages.")
+        print("There aren't outdated packages.")
     else:
         print(outdated_list.stdout)
     exit(0)
@@ -157,11 +157,11 @@ def update_packages(config, outdated_data, log_date, local_path):
                     while True:
                         question = f"Update {pkg_name} from {pkg_version} to {latest_version}? (y/n): "
                         confirmation = input(question).strip().lower()
-                        if confirmation == "y" or confirmation == "n":
+                        if confirmation == 'y' or confirmation == 'n':
                             break
                         else:
-                            print(f'Invalid input. Please, enter "y" or "n".')
-                    if confirmation != "y":
+                            print('Invalid input. Please, enter "y" or "n".')
+                    if confirmation != 'y':
                         msg = f"{pkg_name} not updated - cancelled by user."
                         print(msg)
                         logging.info(msg)
@@ -169,13 +169,11 @@ def update_packages(config, outdated_data, log_date, local_path):
                     else:
                         msg = f"Updating {pkg_name} from {pkg_version} to {latest_version}."
                         print(msg)
-                        update_single_package(
-                            pkg_name, pkg_version, latest_version, False
-                        )
+                        update_single_package(pkg_name, pkg_version, latest_version, False)
                         continue
                 else:
                     update_single_package(pkg_name, pkg_version, latest_version, False)
-                    msg = f"{pkg_name} updated to {latest_version}."
+                    msg = f"{pkg_name} updated to {latest_version}"
                     print(msg)
                     continue
 
@@ -202,10 +200,10 @@ def add_exceptions(add_packages, exceptions_file, log_date):
                 print(msg)
                 logging.info(f"{log_date} -- {msg}")
                 file = open(exceptions_file, "a")
-                file.write("\n" + element)
+                file.write('\n' + element)
                 continue
         else:
-            msg = f"Package '{element}' doesn't match the required format."
+            msg = f"Package '{element}' doesn't match the required format"
             print(msg)
             logging.info(f"{log_date} -- {msg}")
             continue
@@ -239,7 +237,7 @@ def get_exceptions_packages(exceptions, exceptions_file, log_date):
         except Exception as e:
             msg = "There was an error trying to read exceptions.txt."
             print(f"{msg}: {str(e)}")
-            logging.info(f"{log_date} -- {msg}")
+            logging.info(f'{log_date} -- {msg}')
             logging.info(str(e))
             exit(0)
     return exceptions_data
@@ -252,7 +250,7 @@ def update_single_package(pkg_name, pkg_version, latest_version, exceptions):
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
+            text=True
         )
     else:
         result = subprocess.run(
@@ -260,7 +258,7 @@ def update_single_package(pkg_name, pkg_version, latest_version, exceptions):
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
+            text=True
         )
     if result.returncode == 0:
         if exceptions:
@@ -284,7 +282,18 @@ def crontab_job(config, local_path):
     log_date = datetime.now()
     crontab = config["crontab"]
     exceptions = config["exceptions"]
-    regex = "^(?:(?:\*(?:\/(?:[1-5][0-9]|[0-9])(?:,(?:[1-5][0-9]|[0-9]))*)?)|^(?:[1-5][0-9]|[0-9])(?:,(?:[1-5][0-9]|[0-9]))|^(?:[1-5][0-9]|[0-9])(?:-(?:[1-5][0-9]|[0-9]))(?:\/(?:[1-5][0-9]|[0-9])(?:,(?:[1-5][0-9]|[0-9]))*)?|^(?:[1-5][0-9]|[0-9])) (?:(?:\*(?:\/(?:[2][0-3]|[1][0-9]|[0-9])(?:,(?:[2][0-3]|[1][0-9]|[0-9]))*)?)|(?:[2][0-3]|[1][0-9]|[0-9])(?:,(?:[2][0-3]|[1][0-9]|[0-9]))|(?:[2][0-3]|[1][0-9]|[0-9])(?:-(?:[2][0-3]|[1][0-9]|[0-9]))(?:\/(?:[2][0-3]|[1][0-9]|[0-9])(?:,(?:[2][0-3]|[1][0-9]|[0-9]))*)?|(?:[2][0-3]|[1][0-9]|[0-9])) (?:(?:\*(?:\/(?:[3][0-1]|[1-2][0-9]|[1-9])(?:,(?:[3][0-1]|[1-2][1-9]|[0-9]))*)?)|(?:[3][0-1]|[1-2][0-9]|[1-9])(?:,(?:[3][0-1]|[1-2][0-9]|[1-9]))|(?:[3][0-1]|[1-2][0-9]|[1-9])(?:-(?:[3][0-1]|[1-2][0-9]|[1-9]))(?:\/(?:[3][0-1]|[1-2][0-9]|[1-9])(?:,(?:[3][0-1]|[1-2][0-9]|[1-9]))*)?|(?:[3][0-1]|[1-2][0-9]|[1-9])) (?:(?:\*(?:\/(?:[1][0-2]|[1-9])(?:,(?:[1][0-2]|[1-9]))*)?)|(?:[1][0-2]|[1-9])(?:,(?:[1][0-2]|[1-9]))|(?:[1][0-2]|[1-9])(?:-(?:[1][0-2]|[1-9]))(?:\/(?:[1][0-2]|[1-9])(?:,(?:[1][0-2]|[1-9]))*)?|(?:[1][0-2]|[1-9])) (?:(?:\*(?:\/(?:[0-6])(?:,(?:[0-6]))*)?)|(?:[0-6])(?:,(?:[0-6]))|(?:[0-6])(?:-(?:[0-6]))(?:\/(?:[0-6])(?:,(?:[0-6]))*)?|(?:[0-6]))$"
+    regex = ('^(?:(?:\*(?:\/(?:[1-5][0-9]|[0-9])(?:,(?:[1-5][0-9]|[0-9]))*)?)|^(?:[1-5][0-9]|[0-9])(?:,(?:[1-5][0-9]|['
+             '0-9]))|^(?:[1-5][0-9]|[0-9])(?:-(?:[1-5][0-9]|[0-9]))(?:\/(?:[1-5][0-9]|[0-9])(?:,(?:[1-5][0-9]|['
+             '0-9]))*)?|^(?:[1-5][0-9]|[0-9])) (?:(?:\*(?:\/(?:[2][0-3]|[1][0-9]|[0-9])(?:,(?:[2][0-3]|[1][0-9]|['
+             '0-9]))*)?)|(?:[2][0-3]|[1][0-9]|[0-9])(?:,(?:[2][0-3]|[1][0-9]|[0-9]))|(?:[2][0-3]|[1][0-9]|[0-9])(?:-('
+             '?:[2][0-3]|[1][0-9]|[0-9]))(?:\/(?:[2][0-3]|[1][0-9]|[0-9])(?:,(?:[2][0-3]|[1][0-9]|[0-9]))*)?|(?:[2]['
+             '0-3]|[1][0-9]|[0-9])) (?:(?:\*(?:\/(?:[3][0-1]|[1-2][0-9]|[1-9])(?:,(?:[3][0-1]|[1-2][1-9]|['
+             '0-9]))*)?)|(?:[3][0-1]|[1-2][0-9]|[1-9])(?:,(?:[3][0-1]|[1-2][0-9]|[1-9]))|(?:[3][0-1]|[1-2][0-9]|['
+             '1-9])(?:-(?:[3][0-1]|[1-2][0-9]|[1-9]))(?:\/(?:[3][0-1]|[1-2][0-9]|[1-9])(?:,(?:[3][0-1]|[1-2][0-9]|['
+             '1-9]))*)?|(?:[3][0-1]|[1-2][0-9]|[1-9])) (?:(?:\*(?:\/(?:[1][0-2]|[1-9])(?:,(?:[1][0-2]|[1-9]))*)?)|('
+             '?:[1][0-2]|[1-9])(?:,(?:[1][0-2]|[1-9]))|(?:[1][0-2]|[1-9])(?:-(?:[1][0-2]|[1-9]))(?:\/(?:[1][0-2]|['
+             '1-9])(?:,(?:[1][0-2]|[1-9]))*)?|(?:[1][0-2]|[1-9])) (?:(?:\*(?:\/(?:[0-6])(?:,(?:[0-6]))*)?)|(?:[0-6])('
+             '?:,(?:[0-6]))|(?:[0-6])(?:-(?:[0-6]))(?:\/(?:[0-6])(?:,(?:[0-6]))*)?|(?:[0-6]))$')
     if re.match(regex, crontab):
         cronjob = CronTab(user=True)
         comment = "pip-updater"
@@ -292,16 +301,16 @@ def crontab_job(config, local_path):
         if not comment_found:
             command = f"python3 {local_path}/pip-updater.py"
             if exceptions:
-                command += " -e"
+                command += ' -e'
             job = cronjob.new(command=command, comment="pip-updater")
             job.setall(crontab)
             job.enable()
         cronjob.write()
         exit(0)
     else:
-        msg = "The crontab format is not correct."
+        msg = "Crontab format is not correct."
         print(msg)
-        logging.info(f"{log_date} -- {msg}")
+        logging.info(f'{log_date} -- {msg}')
         exit(0)
 
 
@@ -312,9 +321,9 @@ def main():
 
     log_file = f"{local_path}/{prog_name_short}.log"
 
-    log_format = "%(message)s"
+    log_format = '%(message)s'
     logging.basicConfig(
-        filename=log_file, encoding="utf-8", format=log_format, level=logging.INFO
+        filename=log_file, encoding='utf-8', format=log_format, level=logging.INFO
     )
 
     if config["crontab"]:
